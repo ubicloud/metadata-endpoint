@@ -1,4 +1,4 @@
-module cert-server
+module metadata-endpoint
 
 go 1.23
 
