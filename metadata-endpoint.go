@@ -11,7 +11,7 @@ import (
 )
 
 // Rate limiter allowing 10 requests per second
-var limiter = rate.NewLimiter(10, 1)
+var limiter = rate.NewLimiter(10, 4)
 
 func fileHandler(filename string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
