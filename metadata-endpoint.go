@@ -35,15 +35,15 @@ func fileHandler(filename string) http.HandlerFunc {
 	}
 }
 
-func main() {
+func mainInternal(listenAndServe func(addr string, handler http.Handler) error) (int, error) {
 	vmInhostName := os.Getenv("VM_INHOST_NAME")
 	if vmInhostName == "" {
-		log.Fatal("Environment variable vm_path is not set")
+		return 1, fmt.Errorf("Environment variable VM_INHOST_NAME is not set")
 	}
 
 	ipv6Address := os.Getenv("IPV6_ADDRESS")
 	if ipv6Address == "" {
-		log.Fatal("Environment variable ipv6_address is not set")
+		return 1, fmt.Errorf("Environment variable ipv6_address is not set")
 	}
 
 	certFilePath := fmt.Sprintf("/vm/%s/cert/cert.pem", vmInhostName)
@@ -55,5 +55,5 @@ func main() {
 	address := fmt.Sprintf("[%s]:8080", ipv6Address) // Format for IPv6
 
 	log.Printf("Server starting on %s...\n", address)
-	log.Fatal(http.ListenAndServe(address, nil))
+	return 0, listenAndServe(address, nil)
 }

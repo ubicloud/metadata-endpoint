@@ -1,0 +1,48 @@
+name: test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      
+      - name: setup ignore coverage
+        run: go get github.com/hexira/go-ignore-cov && go install github.com/hexira/go-ignore-cov
+
+      - name: Run tests
+        run: go test ./... -coverprofile=coverage.out
+
+      - name: Ignore coverage
+        run: go-ignore-cov --file coverage.out
+
+      - name: Run coverage
+        run: |
+          COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print substr($3, 1, length($3)-1)}')
+          if [ "$COVERAGE" = "100.0" ]; then
+            echo "Coverage is 100%"
+          else
+            echo "Coverage is not 100%, it is $COVERAGE%"
+            exit 1
+          fi
+
+      - name: Upload coverage
+        run: go tool cover -html=coverage.out -o coverage.html
+
+      - name: Upload coverage html
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage.html
+          path: coverage.html
+          
