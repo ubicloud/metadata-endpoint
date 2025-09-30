@@ -26,7 +26,7 @@ func fileHandler(filename string) http.HandlerFunc {
 		// Read the specified file
 		data, err := ioutil.ReadFile(filename)
 		if err != nil {
-			http.Error(w, "File not found", http.StatusNotFound)
+			http.Error(w, "Certificate not ready. Please try again in 10 seconds.", http.StatusServiceUnavailable)
 			return
 		}
 

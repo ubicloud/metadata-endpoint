@@ -49,8 +49,8 @@ func TestFileHandler(t *testing.T) {
 	handler = fileHandler("testdata/nonexistent.pem")
 	handler.ServeHTTP(recorder, request)
 
-	if recorder.Code != http.StatusNotFound {
-		t.Errorf("Expected status code %d for non-existent file, got %d", http.StatusNotFound, recorder.Code)
+	if recorder.Code != http.StatusServiceUnavailable {
+		t.Errorf("Expected status code %d for non-existent file, got %d", http.StatusServiceUnavailable, recorder.Code)
 	}
 }
 
