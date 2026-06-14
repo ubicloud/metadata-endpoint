@@ -54,6 +54,22 @@ func TestFileHandler(t *testing.T) {
 	}
 }
 
+func TestIdentityTokenHandler(t *testing.T) {
+	recorder := httptest.NewRecorder()
+	request := httptest.NewRequest("GET", "/identity/token", nil)
+	handler := fileHandler("testdata/token")
+	handler.ServeHTTP(recorder, request)
+
+	if recorder.Code != http.StatusOK {
+		t.Errorf("Expected status code %d, got %d", http.StatusOK, recorder.Code)
+	}
+
+	expectedData := []byte("pat-test-token")
+	if !bytes.Equal(recorder.Body.Bytes(), expectedData) {
+		t.Error("Response body does not match expected content")
+	}
+}
+
 func TestMainInternal(t *testing.T) {
 	// Test with missing VM_INHOST_NAME
 	os.Setenv("VM_INHOST_NAME", "")

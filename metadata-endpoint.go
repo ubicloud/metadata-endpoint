@@ -27,7 +27,7 @@ func fileHandler(filename string) http.HandlerFunc {
 		data, err := ioutil.ReadFile(filename)
 		if err != nil {
 			w.Header().Set("Retry-After", "10")
-			http.Error(w, "Certificate not ready. Please try again in 10 seconds.", http.StatusServiceUnavailable)
+			http.Error(w, "Requested data not ready. Please try again in 10 seconds.", http.StatusServiceUnavailable)
 			return
 		}
 
@@ -49,9 +49,14 @@ func mainInternal(listenAndServe func(addr string, handler http.Handler) error) 
 
 	certFilePath := fmt.Sprintf("/vm/%s/cert/cert.pem", vmInhostName)
 	keyFilePath := fmt.Sprintf("/vm/%s/cert/key.pem", vmInhostName)
+	identityTokenFilePath := fmt.Sprintf("/vm/%s/identity/token", vmInhostName)
 
 	http.HandleFunc("/load-balancer/cert.pem", fileHandler(certFilePath))
 	http.HandleFunc("/load-balancer/key.pem", fileHandler(keyFilePath))
+
+	// Managed identity token: the VM's credential for authenticating to
+	// Ubicloud as its own access control subject.
+	http.HandleFunc("/identity/token", fileHandler(identityTokenFilePath))
 
 	address := fmt.Sprintf("[%s]:8080", ipv6Address) // Format for IPv6
 
